@@ -145,13 +145,19 @@ plot_MI(epochs * (retrain + 1), MI_histories, os.path.splitext(savefile)[0] + '.
 # ########## PLOTS AND TESTS ##########
 # #####################################
 
-# Predict values for test set
-Y_pred = ifn.maximum_likelihood(PFCs_test)
-covariance = ifn.covariance(PFCs_test)
-sigmas = np.sqrt(np.abs(covariance[:,0,0]))
+# ifn = build_gIFN_PFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+# opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
+# ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
+# ifn.built = True
+# ifn.load_weights(loadfile)
 
-for i,j,k,l in zip(X_test, Y_pred, covariance, Y_test):
-    print("infer y = %.3f +- %.3f (%.3f), true y = %.3f" % (j, np.sqrt(k[0,0]), (np.sqrt(k[0,0]) / j), l))
+# # Predict values for test set
+# Y_pred = ifn.maximum_likelihood(PFCs_test)
+# covariance = ifn.covariance(PFCs_test)
+# sigmas = np.sqrt(np.abs(covariance[:,0,0]))
+
+# for i,j,k,l in zip(X_test, Y_pred, covariance, Y_test):
+#     print("infer y = %.3f +- %.3f (%.3f), true y = %.3f" % (j, np.sqrt(k[0,0]), (np.sqrt(k[0,0]) / j), l))
 
 # # Mesh plot
 # plot_mesh(ifn, pt_lower, pt_upper, momentum_scale, )

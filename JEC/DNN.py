@@ -118,6 +118,7 @@ for train_count in range(retrain + 1):
     # Retrain checkpoints
     if train_count == retrain:
         ifn.save_weights(savefile)
+        loadfile = savefile
     else:
         name, ext = os.path.splitext(savefile)
         checkpoint_savefile = "{name}_ckpt{checkpoint}{ext}".format(name = name, checkpoint = train_count, ext = ext) 
@@ -140,31 +141,38 @@ plot_MI(epochs * (retrain + 1), MI_histories, os.path.splitext(savefile)[0] + '.
 # ########## PLOTS AND TESTS ##########
 # #####################################
 
-# Predict values for test set
-Y_pred = ifn.maximum_likelihood(X_test)
-covariance = ifn.covariance(X_test)
-sigmas = np.sqrt(np.abs(covariance[:,0,0]))
+# ifn = build_gIFN_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+# opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
+# ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
+# ifn.built = True
+# ifn.predict([X[:20],Y[:20]])
+# ifn.load_weights(loadfile)
 
-for i,j,k,l in zip(X_test, Y_pred, covariance, Y_test):
-    print("For x = %.3f, infer y = %.3f +- %.3f (%.3f), true y = %.3f" % (i[0], j, np.sqrt(k[0,0]), (np.sqrt(k[0,0]) / j), l))
+# # Predict values for test set
+# Y_pred = ifn.maximum_likelihood(X_test)
+# covariance = ifn.covariance(X_test)
+# sigmas = np.sqrt(np.abs(covariance[:,0,0]))
 
-# Mesh plot
-plot_mesh(ifn, pt_lower, pt_upper, momentum_scale, )
+# for i,j,k,l in zip(X_test, Y_pred, covariance, Y_test):
+#     print("For x = %.3f, infer y = %.3f +- %.3f (%.3f), true y = %.3f" % (i[0], j, np.sqrt(k[0,0]), (np.sqrt(k[0,0]) / j), l))
 
-# Errorbar plots
-plt.errorbar(X_test[:,0] * momentum_scale , Y_pred * momentum_scale, yerr=sigmas * momentum_scale, fmt='o', color='blue',
-             ecolor='k', elinewidth=1, capsize=2, label= r'$y_{ML}(x)$')
+# # Mesh plot
+# plot_mesh(ifn, pt_lower, pt_upper, momentum_scale, )
 
-plt.scatter(X_test[:,0] * momentum_scale , Y_test[:,0] * momentum_scale ,  color = 'red', label= r'True Gen $p_T$')
-plt.scatter(X_test[:,0] * momentum_scale , np.multiply(X_test[:,0] * momentum_scale , C_test[:] ) ,  color = 'green', label= r'SIM $\times$ CMS-JEC')
-plt.grid()
-plt.legend()        
+# # Errorbar plots
+# plt.errorbar(X_test[:,0] * momentum_scale , Y_pred * momentum_scale, yerr=sigmas * momentum_scale, fmt='o', color='blue',
+#              ecolor='k', elinewidth=1, capsize=2, label= r'$y_{ML}(x)$')
 
-plt.savefig("JEC/Plots/DNN.png")
+# plt.scatter(X_test[:,0] * momentum_scale , Y_test[:,0] * momentum_scale ,  color = 'red', label= r'True Gen $p_T$')
+# plt.scatter(X_test[:,0] * momentum_scale , np.multiply(X_test[:,0] * momentum_scale , C_test[:] ) ,  color = 'green', label= r'SIM $\times$ CMS-JEC')
+# plt.grid()
+# plt.legend()        
 
-# Losses
-jec_loss = np.mean(np.square(np.multiply(X_test[:,0] * momentum_scale , C_test[:] )  - (Y_test * momentum_scale)))
-ml_loss = np.mean(np.square( (Y_pred * momentum_scale)  - (Y_test * momentum_scale)))
+# plt.savefig("JEC/Plots/DNN.png")
 
-print(jec_loss)
-print(ml_loss)
+# # Losses
+# jec_loss = np.mean(np.square(np.multiply(X_test[:,0] * momentum_scale , C_test[:] )  - (Y_test * momentum_scale)))
+# ml_loss = np.mean(np.square( (Y_pred * momentum_scale)  - (Y_test * momentum_scale)))
+
+# print(jec_loss)
+# print(ml_loss)
