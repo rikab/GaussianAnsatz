@@ -25,7 +25,7 @@ x_dim = 1
 y_dim = 1
 
 epochs = 50
-pre_train_epochs = 5
+pre_train_epochs = 1
 batch_size = 512
 pre_train_batch_size = 128
 
@@ -34,7 +34,7 @@ pre_train_batch_size = 128
 # ########## DATASET ##########
 # #############################
 
-N = 250000
+N = 25000
 
 # Gaussian Noise Dataset
 X = np.random.uniform(low = -5, high = 5, size = (N, x_dim))
@@ -72,7 +72,7 @@ ifn.fit([X, Y],
 # ########## PLOTS AND TESTS ##########
 # #####################################
 
-x_test = np.array([-5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+x_test = np.array([-5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0]).reshape((11, 1))
 y_pred = ifn.maximum_likelihood(x_test)
 covariance = ifn.covariance(x_test)
 sigmas = np.sqrt(np.abs(covariance[:,0,0]))

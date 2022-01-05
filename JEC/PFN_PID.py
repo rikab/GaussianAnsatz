@@ -145,6 +145,12 @@ plot_MI(epochs * (retrain + 1), MI_histories, os.path.splitext(savefile)[0] + '.
 # ########## PLOTS AND TESTS ##########
 # #####################################
 
+ifn = build_gIFN_PFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
+ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
+ifn.built = True
+ifn.load_weights(loadfile)
+
 # Predict values for test set
 Y_pred = ifn.maximum_likelihood(PFCs_test)
 covariance = ifn.covariance(PFCs_test)

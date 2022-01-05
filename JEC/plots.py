@@ -75,7 +75,7 @@ plt.ylabel("Density")
 plt.title(r"Particle Count")
 plt.grid()
 plt.legend()
-plt.savefig("JEC/Plots/particle_count.png")
+plt.savefig("JEC/Plots/particle_count.pdf")
 plt.close()
 
 # ############################
@@ -143,7 +143,7 @@ names = ["DNN", "EFN", "PFN", "PFN_pid"]
 # plt.title("Learned Mutual Information")
 # plt.grid()
 # plt.legend()
-# plt.savefig("JEC/Plots/MI.png")
+# plt.savefig("JEC/Plots/MI.pdf")
 # plt.close()
 
 
@@ -173,7 +173,7 @@ plt.ylabel("Density")
 plt.title(r"Distributions for Gen $p_T \in [695, 705]$ GeV")
 plt.grid()
 plt.legend()
-plt.savefig("JEC/Plots/pt_hist.png")
+plt.savefig("JEC/Plots/pt_hist.pdf")
 plt.close()
 
 # P_t uncertainty distribution histograms
@@ -188,7 +188,7 @@ plt.ylabel("Density")
 plt.title(r"Distributions for Gen $p_T \in [695, 705]$ GeV")
 plt.grid()
 plt.legend(loc = "upper left")
-plt.savefig("JEC/Plots/uncertainty_hist.png")
+plt.savefig("JEC/Plots/uncertainty_hist.pdf")
 plt.close()
 
 
@@ -207,7 +207,7 @@ plt.ylabel("Density")
 plt.title(r"Distributions for Gen $p_T \in [695, 705]$")
 plt.grid()
 plt.legend()
-plt.savefig("JEC/Plots/n_hist.png")
+plt.savefig("JEC/Plots/n_hist.pdf")
 plt.close()
 
 
@@ -290,4 +290,4 @@ axs[2].set_ylabel(r"$I(X;Y)$")
 axs[2].set(xlabel = r"Gen $p_T$ [GeV]")
 axs[2].legend()
 
-plt.savefig("JEC/Plots/triple_plot.png")
+plt.savefig("JEC/Plots/triple_plot.pdf")

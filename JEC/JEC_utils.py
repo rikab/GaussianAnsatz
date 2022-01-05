@@ -38,14 +38,16 @@ def load_data(cache_dir, pt_lower, pt_upper, eta, quality, pad, x_dim = 3, momen
 
     # Gen_pt for Y
     Y1 = sim.jets_f[:,sim.gen_jet_pt]
-    Y = np.zeros((Y1.shape[0], 1))
+    Y = np.zeros((Y1.shape[0], 1), dtype = np.float32 )
     Y[:,0] = Y1 / momentum_scale
 
     # Sim_pt for X
-    X = np.zeros((Y1.shape[0],3))
+    X = np.zeros((Y1.shape[0],3), dtype = np.float32)
     X[:,0] = sim.jets_f[:,sim.jet_pt] / momentum_scale
     X[:,1] = sim.jets_f[:,sim.jet_eta]
     X[:,2] = sim.jets_f[:,sim.jet_phi]
+
+
 
     # CMS JEC's
     C = sim.jets_f[:,sim.jec]
@@ -66,9 +68,8 @@ def load_data(cache_dir, pt_lower, pt_upper, eta, quality, pad, x_dim = 3, momen
     C = C[:n]
 
     # PFC's
-    dataset = np.zeros( (pfcs.shape[0], pad, x_dim) )
+    dataset = np.zeros( (pfcs.shape[0], pad, x_dim), dtype = np.float32 )
     particle_counts = []
-    print(pfcs.size)
     if return_pfcs:
         for (i, jet) in enumerate(pfcs):
             size = min(jet.shape[0], pad)
@@ -89,7 +90,6 @@ def load_data(cache_dir, pt_lower, pt_upper, eta, quality, pad, x_dim = 3, momen
 
     particle_counts = np.array(particle_counts)
 
-
     # Trim and shuffle
     if max_particle_select is not None:
         dataset = dataset[particle_counts < max_particle_select]
@@ -100,8 +100,10 @@ def load_data(cache_dir, pt_lower, pt_upper, eta, quality, pad, x_dim = 3, momen
 
     shuffle_indices = np.random.choice(np.arange(dataset.shape[0]), size = int(dataset.shape[0] * frac), replace=False)
 
+    print("X: ", X.shape, X.dtype)
+    print("Y: ", Y.shape, Y.dtype)
+    print("PFCs: ", dataset.shape, dataset.dtype)
 
-    print(X.shape, dataset.shape)
     if not return_pfcs:
         return X, Y, C, particle_counts
    

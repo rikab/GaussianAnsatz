@@ -266,12 +266,13 @@ class gIFN(IFN):
         return self.network_C
 
     def maximum_likelihood(self, x):
-        return self.network_B.predict(x)
+        return self.network_B(x)
 
     def covariance(self, x):
         b = self.maximum_likelihood(x)
-        b = np.squeeze(b)
-        return -1 * tf.linalg.inv(tf.keras.layers.Reshape( (self.y_dim, self.y_dim) )(self.network_C.predict([x, b]))).numpy()
+        # b = np.squeeze(b)
+        output_c = self.network_C([x, b])
+        return -1 * tf.linalg.inv(tf.keras.layers.Reshape( (self.y_dim, self.y_dim) )(output_c)).numpy()
         
     def uncertainty(self, x):
         covariance = self.covariance(x)

@@ -118,6 +118,7 @@ for train_count in range(retrain + 1):
     # Retrain checkpoints
     if train_count == retrain:
         ifn.save_weights(savefile)
+        loadfile = savefile
     else:
         name, ext = os.path.splitext(savefile)
         checkpoint_savefile = "{name}_ckpt{checkpoint}{ext}".format(name = name, checkpoint = train_count, ext = ext) 
@@ -139,6 +140,13 @@ plot_MI(epochs * (retrain + 1), MI_histories, os.path.splitext(savefile)[0] + '.
 # #####################################
 # ########## PLOTS AND TESTS ##########
 # #####################################
+
+ifn = build_gIFN_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
+ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
+ifn.built = True
+ifn.predict([X[:20],Y[:20]])
+ifn.load_weights(loadfile)
 
 # Predict values for test set
 Y_pred = ifn.maximum_likelihood(X_test)

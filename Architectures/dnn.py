@@ -4,7 +4,7 @@ from keras.layers import Dense, Dropout, Input, Concatenate
 from keras import regularizers
 import keras.backend as K
 import tensorflow as tf
-tf.keras.backend.set_floatx('float64')
+tf.keras.backend.set_floatx('float32')
 
 import numpy as np
 import scipy.special
