@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+
+#SBATCH -J JEC
+#SBATCH -o EFN.out
+#SBATCH -N 1
+#SBATCH -c 64
+#SBATCH -p prod
+#SBATCH -A ctp
+#SBATCH -t 1-0:0:0
+module load cuda
+
+# srun -n 1 -c 1 --exclusive python JEC/DNN.py
+python JEC/EFN.py
+# python JEC/PFN.py
+# python JEC/PFN_PID.py
