@@ -26,16 +26,16 @@ def construct_dense_layers(sizes, acts = 'relu', k_inits = 'he_uniform', dropout
     # iterate over layers:
     layers = []
     for size, act, k_init, dropout, l2_reg, name in zip(sizes, acts, k_inits, dropouts, l2_regs, names):
-        layers.append(Dense(size, 
+        layers.append(tf.keras.layers.Dense(size, 
                   activation=act,
                   kernel_initializer=k_init,
                   bias_initializer=k_init,
-                  kernel_regularizer=regularizers.l2(l2_reg), 
-                  bias_regularizer=regularizers.l2(l2_reg),
+                  kernel_regularizer= tf.keras.regularizers.l2(l2_reg), 
+                  bias_regularizer= tf.keras.regularizers.l2(l2_reg),
                   name = name))
         if dropout > 0:
             dr_name = None if name is None else '{}_dropout'.format(name)
-            layers.append(Dropout(dropout, name = dr_name))
+            layers.append(tf.keras.layers.Dropout(dropout, name = dr_name))
 
     return layers
 
@@ -88,13 +88,13 @@ class DNN(keras.Model):
         # Construct outputs (TODO: SYMMETRIZE FOR D > 2)
         self.output_layers = []
         if isinstance(self._output_shape, (tuple, list)):
-            self.output_layers.append(Dense(np.prod(self._output_shape), activation=  self.output_act,kernel_initializer = next(self.k_inits), bias_initializer=next(self.k_inits),  kernel_regularizer=regularizers.l2(next(self.l2_regs)),  bias_regularizer=regularizers.l2(next(self.l2_regs))))
+            self.output_layers.append(tf.keras.layers.Dense(np.prod(self._output_shape), activation=  self.output_act,kernel_initializer = next(self.k_inits), bias_initializer=next(self.k_inits),  kernel_regularizer=regularizers.l2(next(self.l2_regs)),  bias_regularizer=regularizers.l2(next(self.l2_regs))))
             if len(self._output_shape) > 1:
                 self.output_layers.append(tf.keras.layers.Reshape(self._output_shape, input_shape=(np.prod(self._output_shape),)))
                 # if self.symmetrize:
                 #     self.output_layers.append(symmetrize)
         else:
-            self.output_layers.append(Dense(self._output_shape, activation= self.output_act, kernel_initializer = next(self.k_inits), bias_initializer=next(self.k_inits), kernel_regularizer=regularizers.l2(next(self.l2_regs)), bias_regularizer=regularizers.l2(next(self.l2_regs))))
+            self.output_layers.append(tf.keras.layers.Dense(self._output_shape, activation= self.output_act, kernel_initializer = next(self.k_inits), bias_initializer=next(self.k_inits), kernel_regularizer=regularizers.l2(next(self.l2_regs)), bias_regularizer=regularizers.l2(next(self.l2_regs))))
 
         # Combine 
         self._layers = self.hidden_layers + self.output_layers
@@ -102,7 +102,7 @@ class DNN(keras.Model):
         # Add concatenate layer to input
         if isinstance(self.input_sizes, (tuple, list)):
             if len(self.input_sizes) > 1:
-               self._layers =  [Concatenate()] + self._layers
+               self._layers =  [tf.keras.layers.Concatenate()] + self._layers
        
     # Neural network function (input given output)
     def feed_forward(self, inputs):
