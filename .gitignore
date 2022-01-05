@@ -1,0 +1,6 @@
+*.hdf5
+*.png
+*.pyc
+*.h5
+gitignore
+__pycache__*
