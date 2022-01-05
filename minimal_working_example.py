@@ -25,7 +25,7 @@ x_dim = 1
 y_dim = 1
 
 epochs = 50
-pre_train_epochs = 1
+pre_train_epochs = 5
 batch_size = 512
 pre_train_batch_size = 128
 
