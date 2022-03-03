@@ -7,8 +7,7 @@ import tensorflow as tf
 tf.keras.backend.set_floatx('float32')
 
 import numpy as np
-import scipy.special
-import sklearn.feature_selection
+
 
 from matplotlib import pyplot as plt
 from matplotlib import cm
