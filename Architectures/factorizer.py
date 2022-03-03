@@ -44,15 +44,14 @@ class Factorizer(IFN):
         output = self.x_networks[0](x) * self.y_networks[0](y)
         for i in range(1, self.N):
             output = tf.concat([output, self.x_networks[i](x) * self.y_networks[i](y)], axis = 1)
-        
-        tf.print(tf.math.log(tf.reduce_sum(self.f_weights[None, :] * output, axis = 1)))
+         
         return tf.math.log(tf.reduce_sum(self.f_weights[None, :] * output, axis = 1))
 
 
     # Overwrite train step to include projectors
     def train_step(self, data):
         metrics = super().train_step(data)
-        self.f_weights = self.projector(self.f_weights)
+        # self.f_weights = self.projector(self.f_weights)
         return metrics
 
     # Simplex projector for weights
