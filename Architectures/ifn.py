@@ -149,12 +149,12 @@ class IFN(keras.Model):
 
 
 
-class gIFN(IFN):
+class GaussianAnsatz(IFN):
 
     # Initialize
     def __init__(self, network_A, network_B, network_C, network_D = None, d_multiplier = 1.0, d_l2_reg = 0.0, d_l1_reg = 0.0, x_dim = None, y_dim = None, is_efn = False):
 
-        super(gIFN, self).__init__(network_A)
+        super(GaussianAnsatz, self).__init__(network_A)
 
         # Networks
         self.network_A = network_A
@@ -270,6 +270,7 @@ class gIFN(IFN):
         b = self.maximum_likelihood(x)
         # b = np.squeeze(b)
         output_c = self.network_C([x, b])
+        tf.print(output_c)
         return -1 * tf.linalg.inv(tf.keras.layers.Reshape( (self.y_dim, self.y_dim) )(output_c)).numpy()
         
     def uncertainty(self, x):
