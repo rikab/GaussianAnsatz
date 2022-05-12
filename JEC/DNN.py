@@ -19,9 +19,9 @@ import tensorflow as tf
 
 # IFN Architectures
 from Architectures.dnn import DNN
-from Architectures.ifn import IFN, gIFN
+from Architectures.ifn import IFN, GaussianAnsatz
 from Architectures.ifn import mine_loss, joint, marginal, MI
-from Architectures.utils import build_gIFN_DNN, build_gIFN_EFN, build_gIFN_PFN
+from Architectures.utils import build_gaussianAnsatz_DNN, build_gaussianAnsatz_EFN, build_gaussianAnsatz_PFN
 
 
 # Extra utils
@@ -83,7 +83,7 @@ for train_count in range(retrain + 1):
 
     # Pretrain
     if loadfile is None:
-        ifn = build_gIFN_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+        ifn = build_gaussianAnsatz_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
         print("PRE-TRAINING")
         ifn.pre_train([X,Y], epochs = pre_train_epochs, batch_size= pre_train_batch_size, verbose = True)
         ifn.save_weights(savefile)
@@ -94,12 +94,12 @@ for train_count in range(retrain + 1):
         strategy = tf.distribute.MirroredStrategy()
         print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
         with strategy.scope():
-            ifn = build_gIFN_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+            ifn = build_gaussianAnsatz_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
             opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
             ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
 
     else:
-        ifn = build_gIFN_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+        ifn = build_gaussianAnsatz_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
         opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
         ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
 
@@ -141,7 +141,7 @@ plot_MI(epochs * (retrain + 1), MI_histories, os.path.splitext(savefile)[0] + '.
 # ########## PLOTS AND TESTS ##########
 # #####################################
 
-ifn = build_gIFN_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+ifn = build_gaussianAnsatz_DNN(x_dim, y_dim, param_dict["DNN_sizes"], l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
 opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
 ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
 ifn.built = True

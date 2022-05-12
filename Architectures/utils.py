@@ -19,7 +19,7 @@ import tensorflow as tf
 
 # IFN Architectures
 from Architectures.dnn import DNN
-from Architectures.ifn import IFN, gIFN
+from Architectures.ifn import IFN, GaussianAnsatz
 from Architectures.ifn import mine_loss, joint, marginal, MI
 
 # Energy-flow package for CMS Open Data loader
@@ -33,7 +33,7 @@ from utils import efn_input_converter
 # ########## HELPER FUNCTIONS ########## 
 # ######################################
 
-def build_gIFN_DNN(x_dim, y_dim, layers, opt = None, l2_reg = 0.0, d_l1_reg = 0.0, d_multiplier = 1.0, loadfile = None):
+def build_gaussianAnsatz_DNN(x_dim, y_dim, layers, opt = None, l2_reg = 0.0, d_l1_reg = 0.0, d_multiplier = 1.0, loadfile = None):
     """Helper function to build a basic gIFN DNN in one line
 
     Args:
@@ -54,7 +54,7 @@ def build_gIFN_DNN(x_dim, y_dim, layers, opt = None, l2_reg = 0.0, d_l1_reg = 0.
     model_C = DNN([x_dim, y_dim], layers, [y_dim, y_dim], symmetrize=True, l2_regs = l2_reg)
     model_D = DNN(x_dim, layers, y_dim, l2_regs = l2_reg)
 
-    ifn = gIFN(model_A, model_B, model_C, model_D, d_multiplier= d_multiplier, d_l1_reg = d_l1_reg, y_dim = y_dim)
+    ifn = GaussianAnsatz(model_A, model_B, model_C, model_D, d_multiplier= d_multiplier, d_l1_reg = d_l1_reg, y_dim = y_dim)
 
     # Compile 
     if opt is not None:
@@ -68,7 +68,7 @@ def build_gIFN_DNN(x_dim, y_dim, layers, opt = None, l2_reg = 0.0, d_l1_reg = 0.
     return ifn
 
 
-def build_gIFN_EFN(x_dim, y_dim, Phi_layers, F_layers, acts, pad, opt = None, l2_reg = 0.0, d_l1_reg = 0.0, d_multiplier = 1.0, loadfile = None):
+def build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_layers, F_layers, acts, pad, opt = None, l2_reg = 0.0, d_l1_reg = 0.0, d_multiplier = 1.0, loadfile = None):
     """Helper function to build a basic gIFN DNN in one line
 
     Args:
@@ -96,7 +96,7 @@ def build_gIFN_EFN(x_dim, y_dim, Phi_layers, F_layers, acts, pad, opt = None, l2
     model_C = efn_input_converter(model_C, shape = (pad, x_dim), num_global_features = y_dim)
     model_D = efn_input_converter(model_D, shape = (pad, x_dim))
 
-    ifn = gIFN(model_A, model_B, model_C, model_D, d_multiplier= d_multiplier, y_dim = y_dim, d_l1_reg = d_l1_reg)
+    ifn = GaussianAnsatz(model_A, model_B, model_C, model_D, d_multiplier= d_multiplier, y_dim = y_dim, d_l1_reg = d_l1_reg)
 
     # Compile 
     if opt is not None:
@@ -110,7 +110,7 @@ def build_gIFN_EFN(x_dim, y_dim, Phi_layers, F_layers, acts, pad, opt = None, l2
     return ifn
 
 
-def build_gIFN_PFN(x_dim, y_dim, Phi_layers, F_layers, acts, opt = None, l2_reg = 0.0, d_l1_reg = 0.0, d_multiplier = 1.0, loadfile = None):
+def build_gaussianAnsatz_PFN(x_dim, y_dim, Phi_layers, F_layers, acts, opt = None, l2_reg = 0.0, d_l1_reg = 0.0, d_multiplier = 1.0, loadfile = None):
     """Helper function to build a basic gIFN DNN in one line
 
     Args:
@@ -132,7 +132,7 @@ def build_gIFN_PFN(x_dim, y_dim, Phi_layers, F_layers, acts, opt = None, l2_reg 
     model_D = PFN(input_dim=x_dim, Phi_sizes=Phi_layers, F_sizes=F_layers, Phi_acts = acts, F_acts = acts,  output_act='linear', output_dim= y_dim, Phi_l2_regs = l2_reg, F_l2_regs = l2_reg, name_layers = False,).model
     model_C = PFN(input_dim=x_dim, Phi_sizes=Phi_layers, F_sizes=F_layers, Phi_acts = acts, F_acts = acts,  output_act='linear', output_dim= y_dim*y_dim, num_global_features = y_dim,  Phi_l2_regs = l2_reg, F_l2_regs = l2_reg, name_layers = False,  ).model
 
-    ifn = gIFN(model_A, model_B, model_C, model_D, d_multiplier= d_multiplier, y_dim = y_dim, d_l1_reg = d_l1_reg)
+    ifn = GaussianAnsatz(model_A, model_B, model_C, model_D, d_multiplier= d_multiplier, y_dim = y_dim, d_l1_reg = d_l1_reg)
 
     # Compile 
     if opt is not None:

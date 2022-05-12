@@ -15,7 +15,7 @@ from matplotlib import cm
 from utils import iter_or_rep
 from Architectures.dnn import DNN
 from Architectures.ifn import IFN, GaussianAnsatz
-from Architectures.utils import build_gIFN_DNN
+from Architectures.utils import build_gaussianAnsatz_DNN
 
 
 # #################################
@@ -52,9 +52,8 @@ Y = X + np.random.normal(scale = 1, size = (N, x_dim)) / scale
 # model_C = DNN([x_dim, y_dim], [32, 32, 32], [y_dim, y_dim], symmetrize=False)
 # model_D = DNN(x_dim, [32, 32, 32], y_dim, l2_regs= 0.1)
 
-# ifn = gIFN(model_A, model_B, model_C, model_D, d_multiplier= 0.5)
 
-ifn = build_gIFN_DNN(x_dim, y_dim, [32,32,32], opt = "adam", d_l1_reg=0.1)
+ifn = build_gaussianAnsatz_DNN(x_dim, y_dim, [32,32,32], opt = "adam", d_l1_reg=0.1)
 
 
 

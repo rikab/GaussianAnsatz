@@ -3,7 +3,7 @@ import tensorflow as tf
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from Architectures.ifn import IFN, gIFN
+from Architectures.ifn import IFN, GaussianAnsatz
 
 # ################################
 # ########## FACTORIZER ##########

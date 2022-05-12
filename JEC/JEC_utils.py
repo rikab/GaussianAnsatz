@@ -17,7 +17,7 @@ from utils import join_models
 
 # IFN Architectures
 from Architectures.dnn import DNN
-from Architectures.ifn import IFN, gIFN
+from Architectures.ifn import IFN, GaussianAnsatz
 
 # Energy-flow package for CMS Open Data loader
 import energyflow as ef
