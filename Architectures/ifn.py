@@ -300,9 +300,9 @@ class GaussianAnsatz(IFN):
             T_marginal = self([x,self.shuffle(y)]) - c
             MI = self.eval_MI(x,y,loss, c)
 
-            return yhat, sigma, T_joint.numpy(), MI
+            return yhat.numpy(), sigma, T_joint.numpy(), MI
 
-        return yhat, sigma
+        return yhat.numpy(), sigma
 
 # ###########################
 # ######### LOSSES ##########

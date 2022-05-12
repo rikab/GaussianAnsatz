@@ -33,7 +33,7 @@ pre_train_batch_size = 1024
 # ########## DATASET ##########
 # #############################
 
-N = 1000000
+N = 100000
 scale = 5.0
 
 # Gaussian Noise Dataset
@@ -75,10 +75,13 @@ ifn.fit([X, Y],
 # #####################################
 
 x_test = np.array([-5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0]).reshape((11, 1)) 
-y_pred, sigmas = ifn.eval(x_test / scale)
+y_pred, sigmas = ifn.eval(x_test / scale) 
+y_pred *= scale
+sigmas *= scale
+
 
 for i,j,k in zip(x_test, y_pred, sigmas):
-    print("For x = %.3f, infer y = %.3f +- %.3f" % (i, j*scale, k*scale))
+    print("For x = %.3f, infer y = %.3f +- %.3f" % (i, j, k))
 
 
 # Plotting meshes
@@ -93,13 +96,13 @@ contours = plt.contour(X, Y, Z, 8, colors='black')
 plt.clabel(contours, inline=True, fontsize=8)
 plt.contourf(X, Y, Z, 50, cmap = 'RdGy_r', origin='lower',  alpha=0.5)
 plt.xlabel("Measured X")
-plt.ylabel("Inferred Y")
+plt.ylabel("Inferred Z")
 plt.title("Maximum Likelihood Task")
 cbar = plt.colorbar()
-cbar.set_label("T(x,y)")
+cbar.set_label("T(x,z)")
 
-
-plt.errorbar(x_test, y_pred, yerr=sigmas, fmt='o', color='blue',
+print(x_test.shape, y_pred.shape, sigmas.shape)
+plt.errorbar(x_test[:,0], y_pred[:,0], yerr=sigmas, fmt='o', color='blue',
              ecolor='skyblue', elinewidth=3, capsize=0)
 
 plt.xlim(-5, 5)
