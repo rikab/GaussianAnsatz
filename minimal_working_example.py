@@ -33,7 +33,7 @@ pre_train_batch_size = 1024
 # ########## DATASET ##########
 # #############################
 
-N = 100000
+N = 10000
 scale = 5.0
 
 # Gaussian Noise Dataset
@@ -89,7 +89,7 @@ x = np.linspace(-5, 5, 40)
 y = np.linspace(-5, 5, 40)
 
 X, Y = np.meshgrid(x, y)
-Z = scale * np.reshape(ifn.predict([np.ravel(X) / scale, np.ravel(Y) / scale]), X.shape)
+Z = scale * np.reshape(ifn([np.ravel(X).reshape(-1,1) / scale, np.ravel(Y).reshape(-1,1) / scale]).numpy(), X.shape)
 
 
 contours = plt.contour(X, Y, Z, 8, colors='black')
