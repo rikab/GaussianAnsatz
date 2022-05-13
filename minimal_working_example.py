@@ -33,7 +33,7 @@ pre_train_batch_size = 1024
 # ########## DATASET ##########
 # #############################
 
-N = 10000
+N = 100000
 scale = 5.0
 
 # Gaussian Noise Dataset
