@@ -39,9 +39,8 @@ dependencies = [
     "matplotlib>=3.5.0",
     "numpy",  # compatible versions controlled through scipy
     "energyflow>=1.3.0",
-    "scikit-learn>=1.2.0",
-    "tensorflow>=2.7.0; platform_machine != 'arm64'",
-    "tensorflow-macos>=2.7.0; platform_machine == 'arm64' and platform_system == 'Darwin'",
+    "tensorflow>=2.1.0; platform_machine != 'arm64'",
+    "tensorflow-macos>=2.1.0; platform_machine == 'arm64' and platform_system == 'Darwin'",
 ]
 
 [project.urls]
@@ -71,10 +70,10 @@ only-include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pyshaper"]
+packages = ["src/GaussianAnsatz"]
 
 [tool.coverage.run]
-source = ["pyshaper"]
+source = ["GaussianAnsatz"]
 branch = true
 
 [tool.coverage.report]
