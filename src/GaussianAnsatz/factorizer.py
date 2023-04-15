@@ -1,18 +1,20 @@
+from GaussianAnsatz.archs import IFN, GaussianAnsatz
 import tensorflow as tf
 
-import os, sys
+import os
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from Architectures.ifn import IFN, GaussianAnsatz
 
 # ################################
 # ########## FACTORIZER ##########
 # ################################
 
+
 class Factorizer(IFN):
 
     def __init__(self, N, x_networks, y_networks,):
-        
+
         super(IFN, self).__init__(None)
 
         # Inputs
@@ -31,8 +33,7 @@ class Factorizer(IFN):
                 self.y_networks.append(tf.keras.models.clone_model(y_networks))
 
         # Weights
-        self.f_weights = tf.Variable(initial_value = tf.ones(shape = (self.N,)) / self.N, trainable = True)
-
+        self.f_weights = tf.Variable(initial_value=tf.ones(shape=(self.N,)) / self.N, trainable=True)
 
     def feed_forward(self, inputs):
 
@@ -40,15 +41,15 @@ class Factorizer(IFN):
         x = inputs[0]
         y = inputs[1]
 
-        # Concatenation trick 
+        # Concatenation trick
         output = self.x_networks[0](x) * self.y_networks[0](y)
         for i in range(1, self.N):
-            output = tf.concat([output, self.x_networks[i](x) * self.y_networks[i](y)], axis = 1)
-         
-        return tf.math.log(tf.reduce_sum(self.f_weights[None, :] * output, axis = 1))
+            output = tf.concat([output, self.x_networks[i](x) * self.y_networks[i](y)], axis=1)
 
+        return tf.math.log(tf.reduce_sum(self.f_weights[None, :] * output, axis=1))
 
     # Overwrite train step to include projectors
+
     def train_step(self, data):
         metrics = super().train_step(data)
         # self.f_weights = self.projector(self.f_weights)
@@ -57,15 +58,14 @@ class Factorizer(IFN):
     # Simplex projector for weights
     def projector(self, x):
 
-        x = tf.reshape(x, (1,-1,))
+        x = tf.reshape(x, (1, -1,))
 
-        m,n = x.shape
+        m, n = x.shape
         cnt_m = tf.range(m)
         cnt_n = tf.range(n)
-        u = tf.reverse(tf.sort(x, axis = 1), axis = (1,))
+        u = tf.reverse(tf.sort(x, axis=1), axis=(1,))
 
-        v = (tf.cumsum(u, axis = 1) - 1) / tf.cast(cnt_n + 1, tf.float32)
-        w = tf.gather(v, tf.reduce_sum(tf.cast(u > v, tf.int32), axis = 1), batch_dims = 1)
-        
-        return tf.reshape(tf.nn.relu(x - tf.reshape(w,(m,1))),(-1, ))
+        v = (tf.cumsum(u, axis=1) - 1) / tf.cast(cnt_n + 1, tf.float32)
+        w = tf.gather(v, tf.reduce_sum(tf.cast(u > v, tf.int32), axis=1), batch_dims=1)
 
+        return tf.reshape(tf.nn.relu(x - tf.reshape(w, (m, 1))), (-1, ))
