@@ -2,37 +2,29 @@
 # ########## IMPORTS ##########
 # #############################
 
+
 # Standard stuff
+from JEC.config import param_dict, dataset_dict
+from JEC.JEC_utils import load_data
+from GaussianAnsatz.utils import build_gaussianAnsatz_DNN, build_gaussianAnsatz_EFN, build_gaussianAnsatz_PFN, plot_MI
+from GaussianAnsatz.archs import mine_loss, joint, marginal, MI
+from keras.layers import LeakyReLU
+import tensorflow as tf
 import numpy as np
 from matplotlib import pyplot as plt
-plt.style.use('seaborn-white')
-from matplotlib import cm
 
-import os, sys
+
+import os
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # ML stuff
-import keras
-from keras.models import Model
-from keras.layers import Dense, Dropout, Input, Concatenate, LeakyReLU
-import tensorflow as tf
 
 # IFN Architectures
-from Architectures.dnn import DNN
-from Architectures.ifn import IFN, GaussianAnsatz
-from Architectures.ifn import mine_loss, joint, marginal, MI
-from Architectures.utils import build_gaussianAnsatz_DNN, build_gaussianAnsatz_EFN, build_gaussianAnsatz_PFN
 
-# Energy-flow package for CMS Open Data loader
-import energyflow as ef
-from energyflow.archs import PFN, EFN
-from energyflow.utils import remap_pids
 
 # Extra utils
-from JEC.JEC_utils import load_data
-from JEC.JEC_utils import plot_mesh
-from JEC.config import param_dict, dataset_dict
-from utils import plot_MI
+
 
 # #################################
 # ########## PARAMETERS ###########
@@ -48,7 +40,7 @@ retrain = param_dict["re-train"]
 epochs = param_dict["epochs"]
 pre_train_epochs = param_dict["pre_train_epochs"]
 batch_size = param_dict["batch_size"]
-pre_train_batch_size =  param_dict["pre_train_batch_size"]
+pre_train_batch_size = param_dict["pre_train_batch_size"]
 Phi_sizes, F_sizes = param_dict["Phi_sizes"], param_dict["F_sizes"]
 
 # Learning Parameters
@@ -71,8 +63,8 @@ quality = dataset_dict["quality"]
 # ########## DATASET ##########
 # #############################
 
-X, PFCs, Y, C, N = load_data(cache_dir, pt_lower, pt_upper, eta, quality, pad, momentum_scale = momentum_scale, n = n, max_particle_select = 150, amount = dataset_dict["amount"])
-X_test, PFCs_test, Y_test, C_test, N_test = load_data(cache_dir, pt_lower, pt_upper, eta, quality, pad, momentum_scale = momentum_scale, n = 50)
+X, PFCs, Y, C, N = load_data(cache_dir, pt_lower, pt_upper, eta, quality, pad, momentum_scale=momentum_scale, n=n, max_particle_select=150, amount=dataset_dict["amount"])
+X_test, PFCs_test, Y_test, C_test, N_test = load_data(cache_dir, pt_lower, pt_upper, eta, quality, pad, momentum_scale=momentum_scale, n=50)
 print(X.shape, PFCs.shape, Y.shape)
 
 # ############################
@@ -87,26 +79,25 @@ for train_count in range(retrain + 1):
 
     # Pretain
     if loadfile is None:
-        ifn = build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), pad, l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
+        ifn = build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), pad, l2_reg=l2_reg, d_l1_reg=d_l1_reg, d_multiplier=d_multiplier)
         print("PRE-TRAINING")
-        ifn.pre_train([PFCs[:],Y[:]], epochs = pre_train_epochs, batch_size= pre_train_batch_size, verbose = True)
+        ifn.pre_train([PFCs[:], Y[:]], epochs=pre_train_epochs, batch_size=pre_train_batch_size, verbose=True)
         ifn.save_weights(savefile)
         loadfile = savefile
 
-    # Build Model 
+    # Build Model
     if param_dict["use_distributed_gpu"]:
         strategy = tf.distribute.MirroredStrategy()
         print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
         with strategy.scope():
-            ifn = build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), pad, l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
-            opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
-            ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
+            ifn = build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), pad, l2_reg=l2_reg, d_l1_reg=d_l1_reg, d_multiplier=d_multiplier)
+            opt = tf.keras.optimizers.Adam(clipnorm=clipnorm, lr=learning_rate)
+            ifn.compile(loss=mine_loss, optimizer=opt, metrics=[MI, joint, marginal])
 
     else:
-        ifn = build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), pad, l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
-        opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
-        ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
-    
+        ifn = build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), pad, l2_reg=l2_reg, d_l1_reg=d_l1_reg, d_multiplier=d_multiplier)
+        opt = tf.keras.optimizers.Adam(clipnorm=clipnorm, lr=learning_rate)
+        ifn.compile(loss=mine_loss, optimizer=opt, metrics=[MI, joint, marginal])
 
     # Load a previous model, or pretrain
     if loadfile is not None:
@@ -115,17 +106,16 @@ for train_count in range(retrain + 1):
 
     # Fit
     history = ifn.fit([PFCs, Y],
-            batch_size= batch_size,
-            epochs = epochs,
-            shuffle=True, verbose= 2)
-    
-    
+                      batch_size=batch_size,
+                      epochs=epochs,
+                      shuffle=True, verbose=2)
+
     # Retrain checkpoints
     if train_count == retrain:
         ifn.save_weights(savefile)
     else:
         name, ext = os.path.splitext(savefile)
-        checkpoint_savefile = "{name}_ckpt{checkpoint}{ext}".format(name = name, checkpoint = train_count, ext = ext) 
+        checkpoint_savefile = "{name}_ckpt{checkpoint}{ext}".format(name=name, checkpoint=train_count, ext=ext)
         loadfile = checkpoint_savefile
         ifn.save_weights(checkpoint_savefile)
         retrain_points = retrain_points + [(epochs) * (train_count + 1)]
@@ -139,43 +129,23 @@ for train_count in range(retrain + 1):
     d_multiplier = d_multiplier / 2.0
 
 
-plot_MI(epochs * (retrain + 1), MI_histories, os.path.splitext(savefile)[0] + '.png', retrain_points = retrain_points,  label = "EFN", title = "")
-
+plot_MI(epochs * (retrain + 1), MI_histories, os.path.splitext(savefile)[0] + '.png', retrain_points=retrain_points,  label="EFN", title="")
 
 
 # #####################################
 # ########## PLOTS AND TESTS ##########
 # #####################################
 
-ifn = build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), pad, l2_reg = l2_reg, d_l1_reg = d_l1_reg, d_multiplier = d_multiplier)
-opt = tf.keras.optimizers.Adam(clipnorm = clipnorm, lr = learning_rate)
-ifn.compile(loss=mine_loss, optimizer=opt, metrics = [MI, joint, marginal])
+ifn = build_gaussianAnsatz_EFN(x_dim, y_dim, Phi_sizes, F_sizes, LeakyReLU(), pad, l2_reg=l2_reg, d_l1_reg=d_l1_reg, d_multiplier=d_multiplier)
+opt = tf.keras.optimizers.Adam(clipnorm=clipnorm, lr=learning_rate)
+ifn.compile(loss=mine_loss, optimizer=opt, metrics=[MI, joint, marginal])
 ifn.built = True
-ifn.load_weights(loadfile)    
+ifn.load_weights(loadfile)
 
 # Predict values for test set
 Y_pred = ifn.maximum_likelihood(PFCs_test)
 covariance = ifn.covariance(PFCs_test)
-sigmas = np.sqrt(np.abs(covariance[:,0,0]))
+sigmas = np.sqrt(np.abs(covariance[:, 0, 0]))
 
-for i,j,k,l in zip(X_test, Y_pred, covariance, Y_test):
-    print("infer y = %.3f +- %.3f (%.3f), true y = %.3f" % (j, np.sqrt(k[0,0]), (np.sqrt(k[0,0]) / j), l))
-
-# # Mesh plot
-# plot_mesh(ifn, pt_lower, pt_upper, momentum_scale, )
-
-# # Errorbar plots
-# plt.errorbar(X_test[:,0] * momentum_scale , Y_pred * momentum_scale, yerr=sigmas * momentum_scale, fmt='o', color='blue',
-#              ecolor='k', elinewidth=1, capsize=2, label= r'$y_{ML}(x)$')
-
-# plt.scatter(X_test[:,0] * momentum_scale , Y_test[:,0] * momentum_scale ,  color = 'red', label= r'True Gen $p_T$')
-# plt.scatter(X_test[:,0] * momentum_scale , np.multiply(X_test[:,0] * momentum_scale , C_test[:] ) ,  color = 'green', label= r'SIM $\times$ CMS-JEC')
-        
-# plt.savefig("JEC/Plots/EFN.png")
-
-# # Losses
-# jec_loss = np.mean(np.square(np.multiply(X_test[:,0] * momentum_scale , C_test[:] )  - (Y_test * momentum_scale)))
-# ml_loss = np.mean(np.square( (Y_pred * momentum_scale)  - (Y_test * momentum_scale)))
-
-# print(jec_loss)
-# print(ml_loss)
+for i, j, k, l in zip(X_test, Y_pred, covariance, Y_test):
+    print("infer y = %.3f +- %.3f (%.3f), true y = %.3f" % (j, np.sqrt(k[0, 0]), (np.sqrt(k[0, 0]) / j), l))
